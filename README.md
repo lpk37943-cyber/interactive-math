@@ -1,0 +1,58 @@
+# Interactive Math
+
+**ภาษา:** [ไทย](#ภาษาไทย) · [English](#english)
+
+โครงงานคณิตศาสตร์แบบลงมือทำ — เว็บไซต์เรียนรู้ + เครื่องคิดเลขบล็อก + กระดานเรขาคณิต + สไลด์นำเสนอ
+Hands-on math learning project — a website, a drag-block calculator, a geometry board, and a slide deck.
+
+🔗 **Live:** https://lpk37943-cyber.github.io/interactive-math/
+
+---
+
+## ภาษาไทย
+
+### เกี่ยวกับโครงงาน
+
+Interactive Math เป็นโครงงานคอมพิวเตอร์ของนักเรียนโรงเรียนเลยพิทยาคม สร้างเครื่องมือเรียนคณิตศาสตร์ที่ให้ผู้เรียนได้ลงมือทดลองจริง แทนที่จะอ่านทฤษฎีเฉยๆ ทั้งหมดเขียนด้วย HTML/CSS/JavaScript ล้วนๆ ไม่มี framework ไม่ต้องติดตั้งหรือ build อะไร เปิดไฟล์ตรงๆ ก็ใช้งานได้ทันที
+
+### ส่วนประกอบ
+
+| ส่วน | คืออะไร |
+|---|---|
+| 🌐 [`หน้าเว็บ/`](หน้าเว็บ/index.html) | หน้าเว็บหลัก มี Math Lab ให้ปรับค่ากราฟฟังก์ชันสด (sine/cosine/parabola ฯลฯ) และคลังบทเรียนวิดีโอที่ค้นหา/กรองตามหมวดได้ |
+| 🧮 [`เครื่องคิดเลข/`](เครื่องคิดเลข/เครื่องคิดเลข-บล็อก_2.html) | เครื่องคิดเลขที่ทุกตัวเลข/เครื่องหมายเป็นบล็อกลากได้จริง — Shift ลากยกทั้งพจน์ข้าม "=" แล้วกลับเครื่องหมายให้เอง, Ctrl คลิกแก้ค่าในบล็อก, แก้สมการและวาดกราฟให้อัตโนมัติ |
+| 📐 [`เรขาคณิต/`](เรขาคณิต/index.html) | กระดานวาดจุด-เส้น-รูปทรงอิสระ ระบบตรวจจับรูปปิดเองจากกราฟที่ลาก กด Shift ค้างดูมุม/ความยาว/พื้นที่ได้ทันที |
+| 📊 [`สไลด์นำเสนอ-Interactive-Math.html`](สไลด์นำเสนอ-Interactive-Math.html) | สไลด์สรุปทั้งโครงงานแบบโต้ตอบได้ เลื่อนด้วยลูกศร/ล้อเมาส์/ปัดนิ้ว |
+
+### วิธีใช้งาน
+
+เปิดผ่านลิงก์ GitHub Pages ด้านบนได้เลย หรือจะ clone แล้วดับเบิลคลิกไฟล์ `.html` เปิดในเบราว์เซอร์โดยตรงก็ได้ ไม่ต้องมีเซิร์ฟเวอร์หรือเชื่อมต่ออินเทอร์เน็ต (ยกเว้นฟอนต์และวิดีโอ YouTube ที่ต้องใช้เน็ต)
+
+### ทีมผู้จัดทำ
+
+นักเรียนโรงเรียนเลยพิทยาคม 3 คน — Developer/Project Manager, Product Owner, Tester/Document Manager
+
+---
+
+## English
+
+### About
+
+Interactive Math is a computer science school project by students at Loei Pittayakhom School, building tools that let learners experiment with math hands-on instead of just reading theory. Everything is plain HTML/CSS/JavaScript — no framework, no build step, no install. Open a file and it works.
+
+### What's inside
+
+| Part | What it does |
+|---|---|
+| 🌐 [`หน้าเว็บ/`](หน้าเว็บ/index.html) | The main site — a Math Lab with live-adjustable function graphs (sine/cosine/parabola, etc.) and a searchable/filterable video lesson library |
+| 🧮 [`เครื่องคิดเลข/`](เครื่องคิดเลข/เครื่องคิดเลข-บล็อก_2.html) | A calculator where every digit and operator is a real draggable block — Shift-drag lifts a whole term across "=" and flips its sign automatically, Ctrl-click edits a value in place, and it solves equations and plots graphs on its own |
+| 📐 [`เรขาคณิต/`](เรขาคณิต/index.html) | A free-form board for points, lines, and shapes — it detects closed polygons from whatever you draw, and holding Shift shows angles, lengths, and area live |
+| 📊 [`สไลด์นำเสนอ-Interactive-Math.html`](สไลด์นำเสนอ-Interactive-Math.html) | An interactive slide deck summarizing the whole project — navigate with arrow keys, the mouse wheel, or a swipe |
+
+### Usage
+
+Open it via the GitHub Pages link above, or clone the repo and open any `.html` file directly in a browser — no server or internet connection required (except for web fonts and YouTube-hosted lesson videos).
+
+### Team
+
+Three students at Loei Pittayakhom School — Developer/Project Manager, Product Owner, Tester/Document Manager.
