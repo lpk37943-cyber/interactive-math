@@ -1,0 +1,298 @@
+﻿<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Math — เรียนคณิตศาสตร์แบบ Interactive</title>
+
+<!-- กัน FOUC: ต้องรันก่อน CSS โหลด ไม่งั้นถ้าเคยเลือก light ไว้จะเห็นพื้นมืดวาบ
+     ก่อนสลับเป็นขาว — synchronous ตรงๆ ไม่ต้องรอ DOMContentLoaded -->
+<script>(function(){try{if(localStorage.getItem('im-theme')==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}})();</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/layout.css">
+<link rel="stylesheet" href="assets/css/motion.css">
+</head>
+<body>
+
+<header id="siteHeader">
+  <nav>
+    <span class="nav-refract" aria-hidden="true"></span>
+    <a href="#home" class="logo" data-cursor="link">
+      <span class="logo-mark">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" fill="currentColor"/></svg>
+      </span>
+      Interactive Math
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="#home" data-target="home" class="active" data-cursor="link">หน้าแรก</a>
+      <a href="topics.html" data-target="topics" data-cursor="link">วิธีใช้</a>
+      <a href="#lab" data-target="lab" data-cursor="link">ทดลอง </a>
+      <a href="#about" data-target="about" data-cursor="link">ข้อมูลทีม</a>
+      <a href="#contact" data-target="contact" data-cursor="link">ช่องทางการติดต่อ</a>
+      <span class="nav-underline" id="navUnderline" aria-hidden="true"></span>
+    </div>
+    <div class="nav-cta">
+      <a href="#lab" class="btn btn-outline magnetic" data-cursor="button" style="padding:11px 20px;font-size:.88rem;">ทดลองใน Math Lab</a>
+      <button class="theme-toggle" id="themeToggle" aria-pressed="false" aria-label="สลับเป็นธีมสว่าง" data-cursor="button">
+        <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"/></svg>
+        <svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.8 6.8 0 0 0 10.5 10.5z"/></svg>
+      </button>
+      <button class="menu-btn" id="menuBtn" aria-label="เปิดเมนู" aria-expanded="false" aria-controls="navLinks"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <!-- HERO -->
+  <section class="hero wrap" id="home">
+    <div class="hero-grid">
+      <div>
+        <span class="hero-tagline reveal"><span class="dot" aria-hidden="true"></span>no limit demo test math</span>
+        <h1 data-split>INTERACTIVE<span class="accent">MATH</span></h1>
+        <p class="lead reveal" style="transition-delay:.18s">เรียนรู้คณิตศาสตร์ได้ง่าย ทำความเข้าใจเรขาคณิต และทดลองทำได้อย่างไม่จำกัด</p>
+        <div class="hero-actions reveal" style="transition-delay:.26s">
+          <!-- href ไปคลังบทเรียนไว้เป็นทางสำรอง: ถ้า tools.js พังหรือโหลดไม่ทัน
+               ปุ่มนี้ยังพาไปไหนได้ ไม่ใช่ปุ่มตาย — tools.js จะ preventDefault ทับเอง -->
+          <a href="topics.html" id="openToolChooser" class="btn btn-primary magnetic" data-cursor="button" aria-haspopup="dialog" aria-controls="toolModal">เริ่มทดลองเลย →</a>
+          <a href="#lab" class="btn btn-outline magnetic" data-cursor="button">ทดลอง DEMO</a>
+        </div>
+        <div class="hero-stats reveal" style="transition-delay:.34s">
+          <div class="stat"><b data-count="10">0</b><span>วิธีการใช้</span></div>
+          <div class="stat"><b data-count="2">0</b><span>หมวดหมู่หลัก</span></div>
+          <div class="stat"><b>∞</b><span>การทดลอง</span></div>
+        </div>
+        <div class="scroll-cue reveal" style="transition-delay:.42s"><span class="line" aria-hidden="true"></span>SCROLL</div>
+      </div>
+      <div class="hero-art" id="heroArt" data-parallax="0.14"></div>
+    </div>
+  </section>
+
+  <!-- TOPICS -->
+  <section class="topics" id="topics">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow reveal">Topics</span>
+        <h2 data-split>หมวดหมู่วิธีใช้</h2>
+        <p class="reveal" style="transition-delay:.14s">เลือกหัวข้อที่สนใจ แต่ละหมวดจะสอนใช้วิธีการใช้ให้เข้าใจได้ง่าย</p>
+      </div>
+      <div class="topic-grid">
+
+        <div class="tilt-scene reveal">
+          <a href="topics.html#equation" class="topic-card tilt" data-cursor="card">
+            <div class="topic-icon" style="background:linear-gradient(135deg,#0e7c5c,#2e9fd6)">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 9h16M4 15h16"/><path d="M17 5l3 4-3 4"/></svg>
+            </div>
+            <span class="tag">EQUATION</span>
+            <h3>สมการ</h3>
+            <p>ตัวแปร สมการ อสมการ และการอ่านความหมายของกราฟ</p>
+            <div class="topic-foot"><span>5 วิธีใช้</span><span class="arrow-badge" aria-hidden="true">→</span></div>
+          </a>
+        </div>
+
+        <div class="tilt-scene reveal" style="transition-delay:.09s">
+          <a href="topics.html#geometry" class="topic-card tilt" data-cursor="card">
+            <div class="topic-icon" style="background:linear-gradient(135deg,#2e9fd6,#0e7c5c)">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3L21 20H3L12 3Z"/></svg>
+            </div>
+            <span class="tag">GEOMETRY</span>
+            <h3>เรขาคณิต</h3>
+            <p>สำรวจรูปทรง มุม พื้นที่ และความสัมพันธ์เชิงพื้นที่</p>
+            <div class="topic-foot"><span>5 วิธีใช้</span><span class="arrow-badge" aria-hidden="true">→</span></div>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- MATH LAB — โครงสร้างเดิมทุก id/class ห้ามแก้ (lab.js อ้างอิงอยู่) -->
+  <section id="lab">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow reveal">Demo</span>
+        <h2 data-split>ลองทดลองใช้!</h2>
+        <p class="reveal" style="transition-delay:.14s">ทดลองปรับค่าตัวแปรและดูกราฟ</p>
+      </div>
+      <div class="lab-grid">
+        <div class="panel reveal">
+          <h3>แผงควบคุม</h3>
+          <div style="font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;color:var(--ink-faint);margin-bottom:12px;">FUNCTION</div>
+          <div class="func-list" id="funcList"></div>
+          <div id="sliderHost"></div>
+        </div>
+        <div class="panel reveal" style="transition-delay:.1s">
+          <div class="graph-head">
+            <h3 id="graphTitle">Sine Function</h3>
+            <span class="formula-tag" id="formulaTag">f(x) = A·sin(fx + φ)</span>
+          </div>
+          <div class="graph-box" id="graphBox"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about" id="about">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow reveal">About us</span>
+        <h2 data-split>หน้าที่ของสมาชิกในทีม</h2>        
+      </div>
+      <div class="about-grid">
+
+        <div class="tilt-scene reveal">
+          <div class="about-card tilt" data-cursor="card">
+            <span class="about-num">01 · Developer,Project Manager</span>
+            <h3>สมาชิกทีม 1</h3>
+            <p>ผู้จัดการโปรเจกต์ คอยวางแผนและพัฒนาเว็บไซต์</p>
+          </div>
+        </div>
+
+        <div class="tilt-scene reveal" style="transition-delay:.09s">
+          <div class="about-card tilt" data-cursor="card">
+            <span class="about-num">02 · Product Owner</span>
+            <h3>สมาชิกทีม 2</h3>
+            <p>เป็นคนคิดและตัดสินใจว่าควรจะสร้างฟีเจอร์อะไรและทำไมถึงต้องสร้าง</p>
+          </div>
+        </div>
+
+        <div class="tilt-scene reveal" style="transition-delay:.18s">
+          <div class="about-card tilt" data-cursor="card">
+            <span class="about-num">03 · Tester,document manager</span>
+            <h3>สมาชิกทีม 3</h3>
+            <p>ผู้ทดสอบระบบ คอยตรวจสอบและหาจุดบกพร่อง</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="wrap">
+      <div class="contact-grid">
+        <div>
+          <span class="eyebrow reveal">Contact</span>
+          <h2 class="contact-title" data-split>ส่งข้อเสนอแนะ</h2>
+          <p class="contact-lead reveal" style="transition-delay:.14s">มีคำถาม ข้อเสนอแนะ หรืออยากเห็นเนื้อหาอะไรเพิ่มเติมสามารถติดต่อได้</p>
+          <a href="mailto:hello@interactivemath.th" class="btn btn-primary magnetic reveal" data-cursor="button" style="transition-delay:.22s">ส่งอีเมลถึงเรา →</a>
+        </div>
+        <div class="contact-cards">
+
+          <div class="tilt-scene reveal">
+            <div class="c-card tilt" data-cursor="card">
+              <span class="c-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 6h18v12H3z"/><path d="M3 7l9 6 9-6"/></svg></span>
+              <div><div class="lbl">อีเมล</div><div class="val">example@school.ac.th</div></div>
+            </div>
+          </div>
+
+          <div class="tilt-scene reveal" style="transition-delay:.09s">
+            <div class="c-card tilt" data-cursor="card">
+              <span class="c-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 21s7-6.5 7-11a7 7 0 10-14 0c0 4.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.4"/></svg></span>
+              <div><div class="lbl">โรงเรียน</div><div class="val">เลยพิทยาคม</div></div>
+            </div>
+          </div>
+
+          <div class="tilt-scene reveal" style="transition-delay:.18s">
+            <div class="c-card tilt" data-cursor="card">
+              <span class="c-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span>
+              <div><div class="lbl">เวลาตอบกลับ</div><div class="val">ภายใน 24–48 ชั่วโมง</div></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-top">
+      <div>
+        
+                    Interactive Math
+        </div>
+        
+      <div class="footer-links">
+        <a href="#home" data-cursor="link">หน้าแรก</a>
+        <a href="topics.html" data-cursor="link">วิธีใช้</a>
+        <a href="#lab" data-cursor="link">ทดลอง</a>
+        <a href="#about" data-cursor="link">ข้อมูลทีม</a>
+        <a href="#contact" data-cursor="link">ช่องทางติดต่อ</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ============================================
+     หน้าต่างเลือกเครื่องมือ — เปิดจากปุ่ม "เริ่มทดลองเลย" ในหน้าแรก
+
+     เครื่องมือทั้งสองอยู่คนละโฟลเดอร์กับหน้าเว็บ จึงต้องถอยขึ้นไปหนึ่งชั้น (../)
+     ชื่อโฟลเดอร์เป็นภาษาไทยได้ เพราะหน้านี้ประกาศ charset=UTF-8 ไว้แล้ว
+     เบราว์เซอร์จะเข้ารหัส URL ให้เอง
+     ============================================ -->
+<div class="tool-modal" id="toolModal" role="dialog" aria-modal="true" aria-labelledby="toolModalTitle" hidden>
+  <div class="tm-backdrop"></div>
+  <div class="tm-panel">
+    <button class="tm-close" id="toolModalClose" type="button" aria-label="ปิด">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+
+    <div class="tm-head">
+      <span class="eyebrow">Choose a tool</span>
+      <h2 id="toolModalTitle">เลือกเครื่องมือเครื่องมือ</h2>
+      <p>เลือกใช้เลย - ทั้งสองเครื่องมือพร้อมใช้งาน</p>
+    </div>
+
+    <div class="tm-grid">
+
+      <a href="../เครื่องคิดเลข/เครื่องคิดเลข-บล็อก_2.html" class="topic-card" data-cursor="card">
+        <div class="topic-icon" style="background:linear-gradient(135deg,#0e7c5c,#2e9fd6)">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 9h16M4 15h16"/><path d="M17 5l3 4-3 4"/></svg>
+        </div>
+        <span class="tag">EQUATION</span>
+        <h3>เครื่องคิดเลขบล็อก</h3>
+        <p>ลากพจน์ข้ามเท่ากับได้จริง แก้สมการและวาดกราฟให้อัตโนมัติ</p>
+        <div class="topic-foot"><span>เปิดเครื่องมือ</span><span class="arrow-badge" aria-hidden="true">→</span></div>
+      </a>
+
+      <a href="../เรขาคณิต/index.html" class="topic-card" data-cursor="card">
+        <div class="topic-icon" style="background:linear-gradient(135deg,#2e9fd6,#0e7c5c)">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3L21 20H3L12 3Z"/></svg>
+        </div>
+        <span class="tag">GEOMETRY</span>
+        <h3>กระดานเรขาคณิต</h3>
+        <p>วาดจุด เส้น รูปทรงได้อิสระ วัดมุม ความยาว และพื้นที่ให้ทันที</p>
+        <div class="topic-foot"><span>เปิดเครื่องมือ</span><span class="arrow-badge" aria-hidden="true">→</span></div>
+      </a>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============================================
+     Classic scripts เท่านั้น — ห้ามใส่ type="module"
+     เครื่องนี้ไม่มี Node/Python จึงรัน local server ไม่ได้
+     และ ES module โดน CORS block บน file:// (origin เป็น null)
+     ลำดับสำคัญ: core.js ต้องมาก่อน main.js ต้องอยู่ท้ายสุด
+     ============================================ -->
+<script src="assets/js/core.js"></script>
+<script src="assets/js/theme.js"></script>
+<script src="assets/js/scroll.js"></script>
+<script src="assets/js/cursor.js"></script>
+<script src="assets/js/field.js"></script>
+<script src="assets/js/tilt.js"></script>
+<script src="assets/js/reveal.js"></script>
+<script src="assets/js/hero.js"></script>
+<script src="assets/js/lab.js"></script>
+<script src="assets/js/tools.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

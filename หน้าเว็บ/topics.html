@@ -1,0 +1,114 @@
+﻿<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>วิธีการใช้</title>
+
+<!-- กัน FOUC: ต้องรันก่อน CSS โหลด ไม่งั้นถ้าเคยเลือก light ไว้จะเห็นพื้นมืดวาบ
+     ก่อนสลับเป็นขาว — synchronous ตรงๆ ไม่ต้องรอ DOMContentLoaded -->
+<script>(function(){try{if(localStorage.getItem('im-theme')==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}})();</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/layout.css">
+<link rel="stylesheet" href="assets/css/motion.css">
+<link rel="stylesheet" href="assets/css/lessons.css">
+</head>
+<body>
+
+<main>
+  <section class="lib-head wrap">
+    <a href="index.html#home" class="back-link magnetic reveal" data-cursor="button">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="M11 18l-6-6 6-6"/></svg>
+      กลับหน้าแรก
+    </a>
+    <span class="eyebrow reveal" style="transition-delay:.06s">Tutorial Library</span>
+    <h1 data-split>คลังวิธีใช้</h1>
+    <p class="lead reveal" style="transition-delay:.16s">เลือกดูวิดีโอสอนใช้งานตามหมวดหมู่  ดูซ้ำได้ไม่จำกัด </p>
+  </section>
+
+  <section style="padding:34px 0 96px;">
+    <div class="wrap">
+
+      <!-- แถบเครื่องมือ -->
+      <div class="lib-tools reveal">
+        <div class="tool-row">
+          <div class="search-wrap">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+            <input type="search" id="lessonSearch" placeholder="ค้นหาชื่อวิธีใช้..." aria-label="ค้นหาบทเรียน">
+          </div>
+        </div>
+        <div class="tool-row">
+          <span class="tool-label">หมวดหมู่</span>
+          <div class="chip-bar" id="catFilter"></div>
+        </div>
+      </div>
+
+      <div class="lib-count" id="lessonCount"></div>
+
+      <!-- ตารางบทเรียน (วาดโดย lessons.js) -->
+      <div class="lesson-grid" id="lessonGrid"></div>
+
+      <div class="lib-empty" id="lessonEmpty" hidden>
+        <b>ไม่พบบทเรียนที่ตรงกับที่ค้นหา</b>
+        <span>ลองเปลี่ยนคำค้น หรือเลือกหมวดหมู่อื่นดูนะ</span>
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-top">
+      <div>
+          Interactive Math
+        </div>
+      <div class="footer-links">
+        <a href="index.html#home" data-cursor="link">หน้าแรก</a>
+        <a href="topics.html" data-cursor="link">วิธีใช้</a>
+        <a href="index.html#lab" data-cursor="link">ทดลอง</a>
+        <a href="index.html#about" data-cursor="link">ข้อมูลทีม</a>
+        <a href="index.html#contact" data-cursor="link">ติดต่อเรา</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- หน้าต่างเล่นวิดีโอ -->
+<div class="video-modal" id="videoModal" role="dialog" aria-modal="true" aria-labelledby="videoTitle" hidden>
+  <div class="vm-backdrop"></div>
+  <div class="vm-panel">
+    <button class="vm-close" id="videoClose" aria-label="ปิดวิดีโอ">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <div id="videoStage"></div>
+    <div class="vm-info">
+      <h2 id="videoTitle"></h2>
+      <div id="videoMeta"></div>
+      <p id="videoDesc"></p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================
+     Classic scripts เท่านั้น — ห้ามใส่ type="module"
+     data-lessons.js ต้องมาก่อน lessons.js
+     (และเป็น .js ไม่ใช่ .json เพราะ fetch โดน CORS block บน file://)
+     ============================================ -->
+<script src="assets/js/core.js"></script>
+<script src="assets/js/theme.js"></script>
+<script src="assets/js/scroll.js"></script>
+<script src="assets/js/cursor.js"></script>
+<script src="assets/js/field.js"></script>
+<script src="assets/js/tilt.js"></script>
+<script src="assets/js/reveal.js"></script>
+<script src="assets/js/data-lessons.js"></script>
+<script src="assets/js/lessons.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

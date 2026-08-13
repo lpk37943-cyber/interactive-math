@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>เครื่องคิดเลข</title>
+<!-- ต้องอยู่ก่อน <link> ทุกอัน และต้องเป็น inline ไม่ใช่ไฟล์นอก
+     ถ้าไปตั้งธีมใน shortcuts.js (ท้าย body) หน้าจะถูกวาดด้วยธีมเข้มก่อนหนึ่งเฟรม
+     แล้วค่อยกระพริบเป็นสว่าง ทุกครั้งที่โหลดในโหมดสว่าง -->
+<script>
+  (function () {
+    var saved = null;
+    try { saved = localStorage.getItem('calc-theme'); } catch (e) { /* file:// บางเบราว์เซอร์ห้ามอ่าน */ }
+    var dark = saved === null
+      ? !window.matchMedia('(prefers-color-scheme: light)').matches
+      : saved === 'dark';
+    document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+  })();
+</script>
+<!-- ฟอนต์ที่ tokens.css อ้างถึงไม่ได้ถูกโหลดไว้ที่ไหนใน assets/ เลย เว็บเดิมคงลิงก์เอง
+     เปิดแบบ file:// ออฟไลน์แล้ว request นี้ล้มเหลวเฉยๆ ไม่พัง เพราะ --sans ใน style.css
+     ต่อ system stack เดิมไว้ท้ายสุดแล้ว -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;600;700&family=Noto+Serif+Thai:wght@600;700&display=swap">
+<!-- ลำดับสำคัญ: style.css ต้องมาท้ายสุด ไม่งั้น *{margin:0;padding:0} ของ tokens
+     จะล้าง padding ของปุ่มจนคีย์แพดแบน -->
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/motion.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- ทางกลับหน้าเว็บหลัก ปักมุมบนซ้าย — เฟืองของ shortcuts.js จองมุมบนขวาไว้แล้ว
+     (position:fixed, z-index 41) วางชนกันจะทับกันพอดี -->
+<a class="back-home" href="../หน้าเว็บ/index.html" data-cursor="">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="M11 18l-6-6 6-6"/></svg>
+  กลับหน้าหลัก
+</a>
+
+<header class="page-head">
+  <span class="eyebrow reveal">ALGEBRA CALCULATOR</span>
+  <!-- data-split ให้ reveal.js หั่นทีละ "คำ" ด้วย Intl.Segmenter('th')
+       หั่นทีละตัวอักษรไม่ได้ สระและวรรณยุกต์จะหลุดจากพยัญชนะ -->
+  <h1 data-split>เครื่องคิดเลขบล็อก</h1>
+  <p class="lead reveal">ลากพจน์ข้ามเท่ากับ · Ctrl-คลิกเพื่อแก้ · แก้สมการและวาดกราฟให้เอง</p>
+</header>
+
+<div class="app">
+  <div class="display" id="display"></div>
+
+  <div class="grid">
+    <button class="span2" onclick="action('(')">(</button>
+    <button class="span2" onclick="action(')')">)</button>
+
+    <button onclick="percentLast()">%</button>
+    <button onclick="clearEntry()">CE</button>
+    <button onclick="clearAll()">C</button>
+    <button onclick="backspace()" aria-label="ลบ">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle;">
+        <path d="M8 4H20C20.5523 4 21 4.44772 21 5V19C21 19.5523 20.5523 20 20 20H8L3 12L8 4Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+        <path d="M12.5 9.5L17 14M17 9.5L12.5 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+    </button>
+
+    <button onclick="action('1/x')">1/x</button>
+    <button onclick="squareLast()">x²</button>
+    <button onclick="rootLast()">²√x</button>
+    <button onclick="divideLast()">÷</button>
+
+    <button onclick="action('7')">7</button>
+    <button onclick="action('8')">8</button>
+    <button onclick="action('9')">9</button>
+    <button onclick="action('×')">×</button>
+
+    <button onclick="action('4')">4</button>
+    <button onclick="action('5')">5</button>
+    <button onclick="action('6')">6</button>
+    <button onclick="action('−')">−</button>
+
+    <button onclick="action('1')">1</button>
+    <button onclick="action('2')">2</button>
+    <button onclick="action('3')">3</button>
+    <button onclick="action('+')">+</button>
+
+    <button onclick="negateLast()">+/-</button>
+    <button onclick="action('0')">0</button>
+    <button onclick="action('.')">.</button>
+    <button class="equals" onclick="action('=')">=</button>
+  </div>
+
+  <div class="letters" id="letters"></div>
+</div>
+
+<div class="graph" id="graph" hidden></div>
+
+<!-- core ต้องมาก่อนเสมอ โมดูลอื่นลงทะเบียนกับ IM.register แล้ว main.js เรียกทีเดียว
+     ตอน DOMContentLoaded — จึงรันหลัง script.js เสมอ ไม่ว่าจะวางลำดับไหน
+     cursor.js ซ่อนเคอร์เซอร์ระบบทั้งหน้า จุด+วงแหวนจึงอยู่ครบทุกที่ไม่หายไปไหน
+     ส่วนความหมายที่ grab/pointer เคยบอก ย้ายไปอยู่ที่สีของวงแหวน — shortcuts.js อ่าน
+     สถานะจากคลาสที่ script.js เขียนไว้แล้ว (.picking/.choosing/.block-carry/.block-aimable)
+     ไม่โหลด tilt.js — เขียน transform ทุกเฟรม ทำให้ getBoundingClientRect ใน
+     script.js วัดตำแหน่งเพี้ยน การลากบล็อกจะไม่ตรง -->
+<script src="assets/js/core.js"></script>
+<script src="assets/js/field.js"></script>
+<script src="assets/js/reveal.js"></script>
+<script src="assets/js/cursor.js"></script>
+<script src="assets/js/main.js"></script>
+<script src="script.js"></script>
+<script src="shortcuts.js"></script>
+</body>
+</html>

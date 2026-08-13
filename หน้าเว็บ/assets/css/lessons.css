@@ -1,0 +1,266 @@
+/* ============================================
+   lessons.css — เฉพาะหน้าคลังบทเรียน (topics.html)
+
+   ใช้ token และวัสดุแก้วชุดเดิมจาก tokens.css / layout.css
+   ไฟล์นี้เพิ่มเฉพาะของที่หน้าแรกไม่มี
+   ============================================ */
+
+/* ---------- ปุ่มกลับหน้าแรก ----------
+   ไม่ transition transform ของตัวปุ่มเอง
+   เพราะ cursor.js เขียน transform ทุกเฟรมตอนดูดเมาส์ (magnetic)
+   ถ้าใส่ transition จะสู้กันแล้วหนืด — ขยับแค่ลูกศรข้างในพอ */
+.back-link{
+  display:inline-flex;align-items:center;gap:9px;
+  font-family:var(--sans);font-size:.9rem;font-weight:500;
+  color:var(--ink-soft);
+  padding:10px 20px 10px 16px;border-radius:100px;
+  margin-bottom:26px;
+  border:1px solid var(--rim-soft);
+  background:rgba(255,255,255,.06);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.24);
+  backdrop-filter:blur(12px) saturate(150%);
+  -webkit-backdrop-filter:blur(12px) saturate(150%);
+  transition:color .25s var(--ease-out), background .25s var(--ease-out),
+             border-color .25s var(--ease-out), box-shadow .25s var(--ease-out);
+}
+.back-link svg{
+  transition:transform .3s var(--ease-out);
+}
+.back-link:hover{
+  color:var(--ink);
+  background:rgba(255,255,255,.12);
+  border-color:rgba(255,255,255,.42);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45), 0 8px 20px -12px rgba(0,0,0,.6);
+}
+.back-link:hover svg{transform:translateX(-3px);}
+
+/* ---------- หัวหน้า ---------- */
+.lib-head{padding:44px 0 8px;}
+.lib-head h1{
+  font-size:clamp(2.1rem,4.6vw,3.3rem);font-weight:700;line-height:1.2;
+  margin:16px 0 14px;
+}
+.lib-head .lead{color:var(--ink-soft);font-size:1.05rem;max-width:640px;}
+
+/* ---------- แถบเครื่องมือ (ค้นหา + ตัวกรอง) ---------- */
+.lib-tools{
+  display:flex;flex-direction:column;gap:18px;
+  padding:26px;border-radius:var(--radius);margin-bottom:34px;
+  background:linear-gradient(180deg, var(--glass-1), var(--glass-2) 55%, var(--glass-3));
+  backdrop-filter:blur(18px) saturate(165%) brightness(1.04);
+  -webkit-backdrop-filter:blur(18px) saturate(165%) brightness(1.04);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.62),
+    inset 0 0 0 1px rgba(255,255,255,.13),
+    inset 0 -22px 30px -22px rgba(255,255,255,.42),
+    var(--shadow);
+}
+.tool-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.tool-label{
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-faint);
+  min-width:74px;
+}
+
+/* ค้นหา */
+.search-wrap{position:relative;flex:1;min-width:220px;}
+.search-wrap svg{
+  position:absolute;left:16px;top:50%;transform:translateY(-50%);
+  color:var(--ink-faint);pointer-events:none;
+}
+#lessonSearch{
+  width:100%;
+  font-family:var(--sans);font-size:.98rem;color:var(--ink);
+  padding:13px 16px 13px 46px;
+  border-radius:100px;border:1px solid var(--rim-soft);
+  background:rgba(255,255,255,.07);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.24);
+  outline:none;
+  transition:border-color .25s var(--ease-out), background .25s var(--ease-out);
+}
+#lessonSearch::placeholder{color:var(--ink-faint);}
+#lessonSearch:focus{border-color:var(--green-line);background:rgba(255,255,255,.11);}
+
+/* ปุ่มกรอง */
+.chip-bar{display:flex;gap:8px;flex-wrap:wrap;}
+.chip{
+  font-family:var(--sans);font-size:.9rem;font-weight:500;
+  color:var(--ink-soft);cursor:pointer;
+  padding:9px 18px;border-radius:100px;
+  border:1px solid var(--rim-soft);
+  background:rgba(255,255,255,.05);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22);
+  transition:color .25s var(--ease-out), background .25s var(--ease-out),
+             border-color .25s var(--ease-out);
+}
+.chip:hover{color:var(--ink);border-color:rgba(255,255,255,.38);}
+/* ตัวที่เลือกอยู่ = แคปซูลสว่าง ตัวอักษรเข้ม ชุดเดียวกับเมนูหลัก */
+.chip.is-on{
+  color:#14212c;font-weight:600;
+  background:linear-gradient(180deg, rgba(255,255,255,.66), rgba(255,255,255,.38));
+  border-color:rgba(255,255,255,.5);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.95), 0 6px 16px -8px rgba(0,0,0,.45);
+}
+
+.lib-count{
+  font-family:var(--mono);font-size:.78rem;color:var(--ink-faint);
+  margin-bottom:20px;
+}
+
+/* ---------- ตารางบทเรียน ---------- */
+.lesson-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(292px, 1fr));
+  gap:24px;
+}
+
+.lesson-card{
+  display:flex;flex-direction:column;
+  border-radius:var(--radius);overflow:hidden;
+  cursor:pointer;height:100%;
+  background:linear-gradient(180deg, var(--glass-1), var(--glass-2) 55%, var(--glass-3));
+  backdrop-filter:blur(18px) saturate(165%) brightness(1.04);
+  -webkit-backdrop-filter:blur(18px) saturate(165%) brightness(1.04);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.62),
+    inset 0 0 0 1px rgba(255,255,255,.13),
+    inset 0 -22px 30px -22px rgba(255,255,255,.42),
+    var(--shadow);
+}
+
+/* ภาพปก */
+.lesson-thumb{
+  position:relative;
+  aspect-ratio:16/9;
+  background:rgba(0,0,0,.18);
+  overflow:hidden;
+}
+.lesson-thumb svg,.lesson-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+
+.lesson-ep,.lesson-dur,.lesson-soon{
+  position:absolute;
+  font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;
+  padding:5px 10px;border-radius:100px;
+  background:rgba(10,14,20,.62);color:#fff;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);
+}
+.lesson-ep{top:12px;left:12px;}
+.lesson-dur{bottom:12px;right:12px;}
+.lesson-soon{
+  top:12px;right:12px;
+  background:rgba(255,255,255,.82);color:#14212c;font-weight:600;
+}
+
+/* ปุ่มเล่น */
+.lesson-play{
+  position:absolute;left:50%;top:50%;
+  width:56px;height:56px;margin:-28px 0 0 -28px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:50%;color:#14212c;
+  background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.68));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,1), 0 10px 24px -8px rgba(0,0,0,.6);
+  transform:scale(.82);opacity:0;
+  transition:transform .4s var(--ease-out), opacity .35s var(--ease-out);
+  pointer-events:none;
+}
+.lesson-card:hover .lesson-play,
+.lesson-card:focus-visible .lesson-play{transform:scale(1);opacity:1;}
+
+/* เนื้อการ์ด */
+.lesson-body{padding:20px 22px 24px;display:flex;flex-direction:column;flex:1;}
+.lesson-meta{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
+.lesson-cat{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;}
+.lesson-card h3{font-size:1.1rem;font-weight:700;line-height:1.4;margin-bottom:8px;}
+.lesson-card p{color:var(--ink-soft);font-size:.9rem;line-height:1.62;}
+
+/* บทที่ยังไม่มีวิดีโอ — จางลงและกดไม่ได้ */
+.lesson-card.is-soon{cursor:default;}
+.lesson-card.is-soon .lesson-thumb{opacity:.55;}
+.lesson-card.is-soon h3{color:var(--ink-soft);}
+
+/* ไม่พบผลลัพธ์ */
+.lib-empty{
+  text-align:center;padding:64px 24px;color:var(--ink-soft);
+}
+.lib-empty b{display:block;font-family:var(--display);font-size:1.3rem;color:var(--ink);margin-bottom:8px;}
+
+/* ---------- หน้าต่างวิดีโอ ---------- */
+.video-modal{
+  position:fixed;inset:0;z-index:200;
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;
+}
+/* *** ห้ามลบบรรทัดนี้ ***
+   แอตทริบิวต์ hidden ทำงานผ่านกฎของเบราว์เซอร์  [hidden]{display:none}
+   ซึ่งมี specificity เท่ากับ .video-modal (0,1,0) พอดี
+   และ stylesheet ของเราเป็น author style จึงชนะกฎของเบราว์เซอร์
+   ผลคือ display:flex ชนะ hidden ไม่มีผล
+   → กล่องใสๆ เต็มจอที่ z-index 200 จะคลุมทั้งหน้าและกินคลิกทุกจุด
+     (ปุ่มกลับหน้าแรก เมนู การ์ดบทเรียน กดไม่ได้เลย)
+   ต้องเขียนกฎที่ specificity สูงกว่า (0,2,0) มาทับ */
+.video-modal[hidden]{display:none;}
+.vm-backdrop{
+  position:absolute;inset:0;
+  background:rgba(8,11,16,.72);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  opacity:0;transition:opacity .3s var(--ease-out);
+}
+.video-modal.is-open .vm-backdrop{opacity:1;}
+
+.vm-panel{
+  position:relative;
+  width:min(980px, 100%);max-height:calc(100vh - 48px);
+  overflow-y:auto;
+  border-radius:24px;
+  background:linear-gradient(180deg, rgba(255,255,255,.20), rgba(255,255,255,.08) 55%, rgba(255,255,255,.14));
+  backdrop-filter:blur(30px) saturate(180%) brightness(1.06);
+  -webkit-backdrop-filter:blur(30px) saturate(180%) brightness(1.06);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.8),
+    inset 0 0 0 1px rgba(255,255,255,.16),
+    0 40px 90px -30px rgba(0,0,0,.8);
+  transform:translateY(18px) scale(.97);
+  opacity:0;
+  transition:transform .42s var(--ease-out), opacity .32s var(--ease-out);
+}
+.video-modal.is-open .vm-panel{transform:none;opacity:1;}
+
+.vm-close{
+  position:absolute;top:14px;right:14px;z-index:2;
+  width:40px;height:40px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:#fff;
+  border:1px solid rgba(255,255,255,.24);
+  background:rgba(10,14,20,.55);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  transition:background .25s var(--ease-out), transform .25s var(--ease-out);
+}
+.vm-close:hover{background:rgba(10,14,20,.8);transform:rotate(90deg);}
+
+#videoStage{
+  aspect-ratio:16/9;width:100%;
+  background:#000;
+  border-radius:24px 24px 0 0;
+  overflow:hidden;
+}
+#videoStage video,#videoStage iframe{width:100%;height:100%;display:block;border:0;}
+
+.vm-info{padding:24px 28px 28px;}
+.vm-info h2{font-size:1.4rem;font-weight:700;margin-bottom:8px;line-height:1.35;}
+#videoMeta{font-family:var(--mono);font-size:.75rem;color:var(--ink-faint);margin-bottom:12px;}
+#videoDesc{color:var(--ink-soft);font-size:.96rem;line-height:1.7;}
+
+/* ---------- responsive ---------- */
+@media (max-width:768px){
+  .lesson-grid{grid-template-columns:1fr;}
+  .tool-label{min-width:0;width:100%;}
+  .video-modal{padding:0;}
+  .vm-panel{border-radius:0;max-height:100vh;height:100%;}
+  #videoStage{border-radius:0;}
+}
+
+@media (prefers-reduced-motion: reduce){
+  .vm-panel,.vm-backdrop{transition:none;}
+  .lesson-play{transition:none;}
+}

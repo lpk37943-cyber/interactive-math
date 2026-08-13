@@ -1,0 +1,1081 @@
+* { box-sizing: border-box; }
+
+/* The fonts tokens.css names are not bundled anywhere in assets/ — the site it came from
+   must have linked them itself. Opened from file:// with no network the request simply
+   fails, so the system stack the calculator always used is kept on the end: offline it
+   reads exactly as it did before, online it gains the Thai faces the theme was drawn for. */
+:root {
+  --sans: 'IBM Plex Sans Thai', 'IBM Plex Sans', -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* The brand green, split in two by who reads it.
+
+     --green and --blue are left exactly as tokens.css set them, in both themes, because
+     assets/js/field.js reads those two through getComputedStyle once at boot and bakes them
+     into the particle canvas. A token that changed with the theme would leave the particles
+     the colour of whichever theme the page happened to open in — and pale mint on a pale
+     ground is not merely off, it is invisible. Held still, they are dependable: the light
+     theme dims that one canvas with a filter instead, which lands the same either way.
+
+     Everything else that was reaching for the green reaches for these instead, and these
+     are free to turn. */
+  --accent: #88f4c5;
+  --accent-2: #34c98a;        /* the foot of the gradient, always the darker of the pair */
+  --accent-lift: #b3f9dd;     /* and where it goes under a pointer */
+  --accent-ink: #08251a;      /* what reads on top of the accent */
+  color-scheme: dark;
+}
+
+/* ---------- the light theme ----------
+   Only the tokens turn over. The glass stops being a white film over a dark ground and
+   becomes a dark film over a light one; the ink stops being near-white and becomes near
+   black. Every rule written against these follows without being touched.
+
+   What deliberately does NOT turn over is the display: its greens, blues, teals and reds
+   are the interface — a solved letter, a slot being typed into, an equation with no answer
+   — and they were picked against white in the first place. The paper stays paper. */
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --bg: #e7ecf2;
+  --bg-hi: #f7f9fc;           /* the bright corner */
+  --bg-lo: #cbd4e0;           /* and the deep one */
+
+  --ink: #16202c;
+  --ink-soft: #3d4d5f;
+  --ink-faint: #566579;
+
+  --accent: #12a074;
+  --accent-2: #0b7150;
+  --accent-lift: #16b884;
+  --accent-ink: #ffffff;
+
+  /* A film of shadow rather than a film of light, which is what glass over a pale ground
+     actually looks like. */
+  --glass-1: rgba(255, 255, 255, .72);
+  --glass-2: rgba(255, 255, 255, .38);
+  --glass-3: rgba(255, 255, 255, .58);
+  --rim: rgba(255, 255, 255, .9);
+  --rim-soft: rgba(19, 32, 46, .12);
+
+  --surface: rgba(255, 255, 255, .6);
+  --mint: rgba(19, 32, 46, .05);
+  --mint-2: rgba(19, 32, 46, .1);
+  --line: rgba(19, 32, 46, .12);
+
+  --shadow: 0 18px 40px -22px rgba(23, 38, 56, .38);
+  --shadow-lift: 0 30px 64px -28px rgba(23, 38, 56, .45);
+}
+
+/* The dot texture in tokens.css is white, which says nothing over a pale ground. */
+:root[data-theme="light"] body::before {
+  background-image: radial-gradient(circle at 1px 1px, rgba(19, 32, 46, .07) 1px, transparent 1px);
+}
+
+/* tokens.css draws the focus ring in --green, which is now pinned to the particle colour
+   and far too pale to ring anything on a light page. It follows the accent instead. */
+:focus-visible {
+  outline: 2.5px solid var(--accent);
+}
+
+/* The particles are baked one colour for good (see --green above), so the light theme darkens
+   that one canvas rather than recolouring it. Deterministic: the input is always the same. */
+:root[data-theme="light"] #field {
+  filter: brightness(.42) saturate(1.8);
+}
+
+/* The diagonal gradient, the dot texture and the type colour all come from tokens.css.
+   What is left here is what this page adds: room around the machine, and a column so the
+   heading stands above it rather than beside it — the flex row it used to be would have
+   set the two side by side the moment a header was written in. */
+body {
+  padding: 24px 24px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+}
+
+/* The heading, kept to the width of the machine so the two read as one object. */
+.page-head {
+  width: min(420px, 100%);
+  position: relative;   /* above the particle canvas, the same way layout.css lifts its own sections */
+  z-index: 1;
+  text-align: center;
+}
+.page-head h1 {
+  font-family: var(--serif);
+  font-size: clamp(1.7rem, 5vw, 2.3rem);
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 14px 0 8px;
+}
+.page-head .lead {
+  color: var(--ink-soft);
+  font-size: .88rem;
+  line-height: 1.7;
+}
+
+/* The machine itself: the glass card recipe from assets/css/layout.css, which is the one
+   thing in that file this page has a use for — the rest of it dresses a nav, a hero and a
+   footer none of which are here.
+   position/z-index are not decoration: #field and body::before are positioned at z-index 0,
+   and a positioned box paints over a static one however it is ordered, so without this the
+   particle canvas would be drawn across the keypad. */
+.app {
+  position: relative;
+  z-index: 1;
+  width: min(420px, 100%);
+  padding: 18px;
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, var(--glass-1), var(--glass-2) 55%, var(--glass-3));
+  backdrop-filter: blur(18px) saturate(165%) brightness(1.04);
+  -webkit-backdrop-filter: blur(18px) saturate(165%) brightness(1.04);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .62),
+    inset 0 0 0 1px rgba(255, 255, 255, .13),
+    inset 0 -22px 30px -22px rgba(255, 255, 255, .42),
+    var(--shadow);
+  /* Fades in on opacity alone. The .reveal class from motion.css carries a translateY with
+     it, and script.js measures every block with getBoundingClientRect() — for the FLIP it
+     animates by, for the drop target under the pointer, for the ghost it pins while a value
+     rolls over. A moving ancestor puts all of that out by however far it has moved. */
+  animation: app-in .7s var(--ease-out) both;
+}
+
+/* The readout stays paper-white inside the dark glass, so it reads as an instrument dial
+   set into the machine. Every state colour in this file — the green of a solved letter, the
+   blue of the slot being typed into, the red of an equation nothing satisfies, the ribbon a
+   shift-carry lights — was chosen against this white and goes on meaning what it meant.
+   (assets/css/layout.css:245 keeps the Math Lab graph light for the same reason.) */
+.display {
+  position: relative; /* anchor for copies that are pinned while sliding out */
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 12px;
+  margin-bottom: 14px;
+  min-height: 60px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  /* Sunk into the panel rather than laid on it: a dark inner edge at the top where the
+     glass overhangs, and a bright hairline around the whole to catch the rim light. */
+  box-shadow:
+    inset 0 2px 6px -2px rgba(16, 26, 38, .34),
+    0 0 0 1px rgba(255, 255, 255, .5),
+    0 10px 24px -16px rgba(0, 0, 0, .6);
+  /* Digits all one width, so a value rolling over to another of the same length does not
+     shuffle everything beside it along. */
+  font-variant-numeric: tabular-nums;
+}
+.block, .block-ghost {
+  font-size: 26px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: #ffffff;
+  user-select: none;
+  color: #222;
+}
+.block {
+  cursor: grab;
+  will-change: transform;
+}
+/* Each square in a tower is smaller than the one it sits on. The line box grows with
+   them so a tall tower lifts the display instead of spilling out of it. */
+.block sup, .block-ghost sup {
+  font-size: 0.6em;
+}
+/* What a block is divided by sits under it rather than beside it, the way a fraction is
+   written by hand: a bar between the two, each centred on the other. */
+.fraction {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: middle;
+  line-height: 1.15;
+}
+.numerator {
+  padding: 0 5px 1px;
+}
+/* The bar is what a ctrl-click takes hold of to write the fraction back out as a number,
+   so it is given room to be pointed at: the line stays two pixels, the target is eight,
+   and the padding around it carries no paint. */
+.bar {
+  align-self: stretch;
+  /* Border-box sizing counts the padding in, so the height is the target and what is left
+     after the padding is the line: eight less twice three leaves the two it draws. */
+  height: 8px;
+  padding: 3px 0;
+  background: currentColor;
+  background-clip: content-box;
+}
+.denominator {
+  padding: 1px 5px 0;
+}
+/* The outgoing glyph of a ctrl-click value change, rolling up out of the way. */
+.block-ghost {
+  position: absolute;
+  pointer-events: none;
+}
+.block.dragging {
+  opacity: 0.25;
+}
+.block-equals {
+  position: relative;
+  z-index: 5;
+}
+.block-equals.active {
+  background: #8fe3d3;
+  cursor: pointer;
+}
+.block-equals.active:hover {
+  background: #74d6c3;
+}
+/* The one letter of a solved equation. Green on its own says only that it has an answer;
+   it darkens under a pointer, and takes one, once ctrl is held — which is what reads the
+   answer out, so that pressing the letter to drag it never opens one. */
+.block-var {
+  background: #9fe38f;
+}
+.display.picking .block-var:hover:not(.typing) {
+  background: #85d873;
+  cursor: pointer;
+}
+/* An equation that reads perfectly well and that no real value satisfies — the letter says
+   so in red, and reads the same way. */
+.block-var.block-unsolved {
+  background: #f3a7a7;
+}
+.display.picking .block-var.block-unsolved:hover:not(.typing) {
+  background: #ec8f8f;
+}
+.block-hint.block-unsolved {
+  color: #b03636;
+}
+/* The block the keypad is pointed at stays lit once clicked, ctrl or no ctrl, the same
+   way an exponent does. Last of the block colours so it wins over a solved letter. */
+.block.typing {
+  background: #8fd3e3;
+  /* Emptied for retyping it has no glyph to be seen by, so it holds open a slot the size
+     of one. A block with anything in it is already bigger than this. */
+  min-width: 1em;
+  min-height: 1em;
+}
+/* With ctrl down, the block under the cursor lights up if a ctrl-click would point the
+   keypad at it. It wins over the other two lit states, because aiming is what the click
+   would do — and blocks that cannot take the keypad stay plain, cursor and all.
+   An exponent lights on its own, so :has() hands the highlight to the innermost level
+   the cursor is in and keeps everything holding it up plain. */
+/* Shift reads the display in terms rather than in blocks: a + or − is the sign of the
+   number written after it, so pointing at either lights both. Green says this is a
+   different kind of pointing from the blue one, which writes. */
+/* What a shift-drag would carry, lit as the one thing it moves as: each piece reaches
+   across the gap to the next — a pixel wider than the gap, since block edges can land on
+   fractions of one and leave a hairline — and only the two ends keep their outer corners.
+   What it overshoots by is painted over by the piece it reaches. */
+.block-carry {
+  background: #9fe38f;
+  border-radius: 0;
+  box-shadow: 7px 0 0 #9fe38f;
+  cursor: pointer;
+}
+.block-carry-first {
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+.block-carry-last {
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+  box-shadow: none;
+}
+/* A denominator is carried on its own — it is the one piece that crosses the "=" by turning
+   into a multiplier rather than by turning its sign — so it lights on its own, in the same
+   green as everything else a shift-drag would take. */
+.block .denominator.half-carry {
+  background: #9fe38f;
+  border-radius: 4px;
+  cursor: pointer;
+}
+/* The side a carried divisor is being held over, which is the side it will multiply. Nothing
+   moves while it is carried — a divisor goes to a whole side at once, not to a place among
+   the blocks — so this is what says the drag has taken hold and where letting go will put it. */
+.block.block-taking {
+  box-shadow: 0 0 0 2px #9fe38f;
+}
+/* What is being carried, drawn under the pointer — copies, since the equation it came from
+   goes on reading as it did until the carry is let go of somewhere that means something. It
+   takes no pointer events of its own, or it would be what every reading of where the pointer
+   is landed on. */
+.hand-ghost {
+  position: fixed;
+  z-index: 20;
+  transform: translate(-50%, -50%);
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  opacity: 0.85;
+  pointer-events: none;
+}
+/* A divisor has no block of its own to copy — it is half of one — so it is drawn as the
+   block it is about to become, in the green it was taken hold of by. */
+.block.hand-half {
+  background: #9fe38f;
+}
+/* A letter with an answer is left out: ctrl reads it rather than pointing the keypad at it,
+   so it keeps its own green and the blue never promises otherwise. */
+.display.picking .block-aimable:hover:not(.block-var):not(:has(sup:hover)):not(:has(.fraction)) {
+  background: #8fd3e3;
+  cursor: pointer;
+}
+/* A fraction hands the highlight to whichever half the cursor is over, since those are
+   what a click there would point the keypad at, not the block holding them. */
+.display.picking .block sup:hover:not(:has(sup:hover)),
+.display.picking .block .numerator:hover:not(:has(sup:hover)),
+.display.picking .block .denominator:hover {
+  background: #8fd3e3;
+  cursor: pointer;
+}
+/* The bar lights across its whole target rather than just the line, so what is about to
+   be pressed is the size it reads as. */
+.display.picking .block .bar:hover {
+  background: #8fd3e3;
+  background-clip: border-box;
+  cursor: pointer;
+}
+/* The slot the keypad is pointed at stays lit once clicked, ctrl or no ctrl, so it is
+   clear where the next digit will land. */
+.block sup.typing,
+.block .numerator.typing,
+.block .denominator.typing {
+  background: #8fd3e3;
+}
+/* Emptied for retyping, it has no glyph left to light up, so it holds open a slot the
+   width of one instead — otherwise there is nothing to show where the next key lands. */
+.block sup.typing:empty,
+.block .numerator.typing:empty,
+.block .denominator.typing:empty {
+  display: inline-block;
+  min-width: 0.5em;
+  min-height: 1em;   /* an empty inline-block has no height of its own to be seen by */
+}
+/* The value that letter stands for: an answer about the equation, not a term in it. */
+.block-hint {
+  font-size: 20px;
+  color: #3b8f43;
+  cursor: default;
+}
+/* A count standing in for several values drops the list down while the pointer is on it.
+   The list is a child of the count, so moving onto it keeps the count hovered — which is
+   what lets the wheel reach the rest of a long list. Nothing between the two, or the
+   pointer would pass out of both on the way down. */
+.block-hint.block-listable {
+  position: relative;
+}
+.answers {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 10;
+  min-width: 100%;
+  /* Tall enough for every answer an equation can have, so the list is read rather than
+     scrolled — and never taller than the room under it, where it still scrolls. */
+  max-height: min(15em, calc(100vh - 140px));
+  overflow-y: auto;
+  padding: 4px 10px;
+  border: 1px solid #3b8f43;
+  border-radius: 6px;
+  background: #ffffff;
+  white-space: nowrap;
+  text-align: left;
+}
+.block-hint.block-listable:hover .answers {
+  display: block;
+}
+/* The curve two letters draw between them, tucked into the corner so it stays out of the
+   way of the display and the keypad.
+
+   Unlike the display, this one is dark. The display is a sheet being written on, and every
+   colour in it means something — a solved letter, a slot being typed into — so it stays
+   paper. The graph is not written on: it is looked at. Dark ground is what lets a thin line
+   of light read as light, which is the whole of what an instrument panel is doing.
+
+   A strip above says what is being looked at, a strip below says what is under the pointer,
+   and only the plot between them takes the drag. */
+.graph {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 1;
+  width: calc(320px + 20px);
+  padding: 0;
+  border: none;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(18, 24, 32, .82), rgba(12, 17, 24, .9));
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .16),
+    inset 0 0 0 1px rgba(255, 255, 255, .09),
+    var(--shadow-lift);
+  line-height: 1.4;
+  /* [hidden] is display:none, so this runs afresh each time a second letter brings the
+     panel back — no JS needed to retrigger it. Filled backwards only: the panel holds the
+     opening keyframe in the moment before the animation starts, so there is no frame of it
+     at full size first, and once it has finished it is left at its own size rather than
+     held there by the animation. */
+  animation: graph-in .42s var(--ease-out) backwards;
+}
+
+/* ---------- the strip above: what is being looked at ---------- */
+.graph-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 12px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, .07);
+}
+.graph-names { display: flex; gap: 6px; }
+.graph-chip {
+  font-family: var(--mono);
+  font-size: .7rem;
+  font-weight: 600;
+  line-height: 1;
+  padding: 4px 8px;
+  border-radius: 100px;
+  /* The two axes are told apart by colour, and by the same two the curve is drawn between:
+     the horizontal one starts it, the vertical one finishes it. */
+  color: #b4ecfd;
+  background: rgba(180, 236, 253, .14);
+  box-shadow: inset 0 0 0 1px rgba(180, 236, 253, .26);
+}
+.graph-chip[data-axis="y"] {
+  color: #88f4c5;
+  background: rgba(136, 244, 197, .14);
+  box-shadow: inset 0 0 0 1px rgba(136, 244, 197, .26);
+}
+.graph-notes { display: flex; gap: 6px; align-items: center; }
+.graph-note {
+  font-family: var(--mono);
+  font-size: .64rem;
+  letter-spacing: .04em;
+  color: var(--ink-faint);
+  opacity: .55;
+  white-space: nowrap;
+}
+
+/* ---------- the plot ---------- */
+/* The only part that takes the drag, and the only part that wears the grab cursor. */
+.graph-plot {
+  position: relative;
+  padding: 10px;
+  line-height: 0;
+  cursor: grab;
+}
+.graph.dragging .graph-plot { cursor: grabbing; }
+.graph-plot svg { display: block; width: 320px; height: 320px; }
+
+.graph-grid {
+  stroke: rgba(255, 255, 255, .06);
+  stroke-width: 1;
+}
+/* Every fifth line a shade stronger, so there is something to count in. */
+.graph-grid-major { stroke: rgba(255, 255, 255, .13); }
+.graph-axis {
+  stroke: rgba(255, 255, 255, .3);
+  stroke-width: 1.5;
+}
+/* Blue where it starts, green where it ends, and laid over two blurred copies of itself so
+   it reads as light rather than paint. Round caps because a curve has no corners. */
+.graph-curve {
+  fill: none;
+  stroke: url(#graph-line);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: url(#graph-glow);
+}
+/* Under the curve, fading out as it falls away from it — the side of the line that the
+   answer is on, without a second line to say so. */
+.graph-area {
+  fill: url(#graph-fill);
+  stroke: none;
+}
+/* Where the curve meets an axis, which is the one thing worth pointing out unasked. */
+.graph-cross {
+  fill: #0c1118;
+  stroke: #88f4c5;
+  stroke-width: 2;
+}
+.graph-tick {
+  fill: var(--ink-faint);
+  opacity: .42;
+  font-size: 9.5px;
+  font-family: var(--mono);
+}
+
+/* ---------- what is under the pointer ---------- */
+.graph-guide {
+  stroke: rgba(136, 244, 197, .45);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+.graph-halo {
+  fill: rgba(136, 244, 197, .22);
+  stroke: rgba(136, 244, 197, .5);
+  stroke-width: 1;
+}
+.graph-dot {
+  fill: #ffffff;
+}
+/* The value written where a guide lands, on a plate of its own so it stays legible over
+   whatever it falls on. */
+.graph-edge rect {
+  fill: rgba(10, 15, 21, .86);
+  stroke: rgba(136, 244, 197, .3);
+  stroke-width: 1;
+}
+.graph-edge text {
+  fill: #88f4c5;
+  font-size: 10px;
+  font-family: var(--mono);
+  dominant-baseline: middle;
+}
+
+/* ---------- the strip below: the reading, spelled out ---------- */
+/* Under the plot rather than floating over a corner of it, so a value never covers the
+   curve it was taken from. */
+.graph-foot {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  padding: 0;
+  border-top: 1px solid rgba(255, 255, 255, .07);
+  background: rgba(255, 255, 255, .06);
+}
+.graph-read {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  padding: 8px 12px 9px;
+  background: linear-gradient(180deg, rgba(18, 24, 32, .5), rgba(12, 17, 24, .5));
+}
+.graph-read b {
+  font-family: var(--mono);
+  font-size: .7rem;
+  font-weight: 600;
+  color: var(--accent);
+  opacity: .75;
+}
+.graph-read span {
+  font-family: var(--mono);
+  font-size: .82rem;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;   /* a value ticking up must not shuffle the one beside it */
+}
+
+@keyframes graph-in {
+  from { opacity: 0; transform: translateY(10px) scale(.97); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ---------- the graph in the light theme ----------
+   A dark card on a pale page reads as a hole cut in it, so the panel turns over with
+   everything else. Neon needs a dark ground to be neon on: over white the same curve is
+   drawn in ink instead — deep teal into deep green, the two ends still telling the axes
+   apart, and the glow left behind, which is a thing light does and ink does not.
+
+   The gradient stops are set by script.js as presentation attributes, and CSS outranks
+   those, so the whole of it turns over here without the drawing code knowing. */
+:root[data-theme="light"] .graph {
+  background: linear-gradient(180deg, rgba(255, 255, 255, .9), rgba(255, 255, 255, .74));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .9),
+    inset 0 0 0 1px rgba(19, 32, 46, .1),
+    var(--shadow-lift);
+}
+:root[data-theme="light"] .graph-head { border-bottom-color: rgba(19, 32, 46, .1); }
+:root[data-theme="light"] .graph-foot {
+  border-top-color: rgba(19, 32, 46, .1);
+  background: rgba(19, 32, 46, .07);
+}
+:root[data-theme="light"] .graph-read {
+  background: linear-gradient(180deg, rgba(255, 255, 255, .62), rgba(255, 255, 255, .45));
+}
+:root[data-theme="light"] .graph-chip {
+  color: #0b6a86;
+  background: rgba(14, 124, 156, .12);
+  box-shadow: inset 0 0 0 1px rgba(14, 124, 156, .28);
+}
+:root[data-theme="light"] .graph-chip[data-axis="y"] {
+  color: #0b7150;
+  background: rgba(11, 113, 80, .12);
+  box-shadow: inset 0 0 0 1px rgba(11, 113, 80, .28);
+}
+:root[data-theme="light"] .graph-grid { stroke: rgba(19, 32, 46, .09); }
+:root[data-theme="light"] .graph-grid-major { stroke: rgba(19, 32, 46, .17); }
+:root[data-theme="light"] .graph-axis { stroke: rgba(19, 32, 46, .38); }
+:root[data-theme="light"] .graph-tick { opacity: .62; }
+
+/* The two ends of the curve, and the shading that falls away beneath it. */
+:root[data-theme="light"] #graph-line stop:first-child { stop-color: #0b6a86; }
+:root[data-theme="light"] #graph-line stop:last-child { stop-color: #0b7150; }
+:root[data-theme="light"] #graph-fill stop:first-child { stop-color: #12a074; stop-opacity: .26; }
+:root[data-theme="light"] #graph-fill stop:last-child { stop-color: #12a074; stop-opacity: 0; }
+/* Light does not bloom off ink. */
+:root[data-theme="light"] .graph-curve { filter: none; stroke-width: 2.2; }
+
+:root[data-theme="light"] .graph-cross { fill: #ffffff; stroke: #0b7150; }
+:root[data-theme="light"] .graph-dot { fill: #10202c; }
+:root[data-theme="light"] .graph-guide { stroke: rgba(11, 113, 80, .5); }
+:root[data-theme="light"] .graph-halo {
+  fill: rgba(18, 160, 116, .18);
+  stroke: rgba(11, 113, 80, .45);
+}
+:root[data-theme="light"] .graph-edge rect {
+  fill: rgba(255, 255, 255, .94);
+  stroke: rgba(11, 113, 80, .34);
+}
+:root[data-theme="light"] .graph-edge text { fill: #0b5f43; }
+
+/* ---------- the display's rim in the light theme ----------
+   The paper stays paper, and every state colour on it stays exactly as it was. Only the
+   hairline around it turns: a white rim says nothing once the page behind it is pale. */
+:root[data-theme="light"] .display {
+  box-shadow:
+    inset 0 2px 6px -3px rgba(16, 26, 38, .2),
+    0 0 0 1px rgba(19, 32, 46, .1),
+    0 10px 24px -18px rgba(23, 38, 56, .35);
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+/* A bracket takes half a row, so the pair fills one on its own. */
+.grid .span2 {
+  grid-column: span 2;
+}
+.letters {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+}
+/* Thin glass, the same film the panel is made of but lighter, so a key reads as cut from
+   the machine rather than laid on top of it.
+   Laid out as a centred flex box on purpose: tokens.css sets img,svg{display:block}, which
+   drops the backspace icon out of the text flow and leaves it against the left edge of its
+   key. Centring the box puts it back, and does the same for the glyph on every other key. */
+button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--rim-soft);
+  background: linear-gradient(180deg, var(--glass-1), var(--glass-2));
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .45),
+    0 6px 16px -12px rgba(0, 0, 0, .6);
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 18px;
+  padding: 16px 0;
+  cursor: pointer;
+  color: var(--ink);
+  /* transform is transitioned here and nowhere else in this file: no script writes one onto
+     a key, so there is nothing for it to fight. The blocks are the opposite case — see .app. */
+  transition:
+    background .25s var(--ease-out),
+    border-color .25s var(--ease-out),
+    box-shadow .25s var(--ease-out),
+    transform .12s var(--ease-out);
+}
+button:hover {
+  background: linear-gradient(180deg, rgba(255, 255, 255, .28), var(--glass-3));
+  border-color: rgba(255, 255, 255, .42);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .62),
+    0 10px 22px -12px rgba(0, 0, 0, .65);
+}
+button:active { transform: scale(.96); }
+
+/* The letters are a second keypad, reached for far less often than the digits, so they sit
+   back a step: smaller, quieter glass, and no film of their own to blur through. */
+.letters button {
+  font-size: 15px;
+  padding: 10px 0;
+  background: rgba(255, 255, 255, .05);
+  border-color: rgba(255, 255, 255, .12);
+  color: var(--ink-soft);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .18);
+}
+.letters button:hover {
+  background: rgba(255, 255, 255, .12);
+  border-color: rgba(255, 255, 255, .3);
+  color: var(--ink);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .34);
+}
+
+/* The one key that does something to the whole display rather than adding to it, so it is
+   the one key painted in the brand green — the same primary the assets use for their calls
+   to action, dark ink on light green for the contrast that needs. */
+.equals {
+  background: linear-gradient(180deg, var(--accent), var(--accent-2));
+  color: var(--accent-ink);
+  font-weight: 700;
+  border-color: transparent;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .45),
+    0 14px 30px -14px rgba(78, 227, 160, .55);
+}
+.equals:hover {
+  background: linear-gradient(180deg, var(--accent-lift), var(--accent));
+  border-color: transparent;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .6),
+    0 18px 38px -14px rgba(78, 227, 160, .68);
+}
+
+/* ---------- the way back to the site this tool was opened from ----------
+   Pinned to the top-left, the corner the gear does not use. Same thin glass as a key, so
+   it reads as part of the machine rather than something laid over the page. It sits above
+   the panel and the graph (both z-index 1) and below the drawn cursor (9999). */
+.back-home {
+  position: fixed;
+  top: 18px;
+  left: 18px;
+  z-index: 41;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 15px 9px 12px;
+  border-radius: 100px;
+  border: 1px solid var(--rim-soft);
+  background: linear-gradient(180deg, var(--glass-1), var(--glass-2));
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .45),
+    0 6px 16px -12px rgba(0, 0, 0, .6);
+  color: var(--ink-soft);
+  font-family: var(--sans);
+  font-size: .82rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    background .25s var(--ease-out),
+    border-color .25s var(--ease-out),
+    color .25s var(--ease-out);
+}
+.back-home:hover {
+  background: linear-gradient(180deg, rgba(255, 255, 255, .28), var(--glass-3));
+  border-color: rgba(255, 255, 255, .42);
+  color: var(--ink);
+}
+.back-home svg { display: block; }
+
+/* On a narrow window the machine is already tight against the top of the page, so the
+   link stops floating over the heading and takes its place in the flow above it. */
+@media (max-width: 560px) {
+  .back-home {
+    position: static;
+    align-self: flex-start;
+    order: -1;
+  }
+}
+
+/* ---------- the gear, and the card of things that can be pressed ---------- */
+
+/* Pinned to the corner rather than set in the flow, so it is in the same place whether the
+   graph has pushed the page taller or not. Above the machine and the graph (both z-index 1)
+   and below the drawn cursor (9999), which should pass over everything. */
+.gear {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 41;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  color: var(--ink-soft);
+}
+.gear:hover { color: var(--ink); }
+.gear svg { display: block; }
+/* The theme switch sits beside the gear, one button's width and one gap to its left, so the
+   two read as a pair of controls rather than one control and a stray. */
+.lamp { right: calc(18px + 44px + 8px); }
+/* Held open, it takes the brand green, so the card and the button that opened it read as
+   one thing. */
+.gear-on {
+  background: linear-gradient(180deg, var(--accent), var(--accent-2));
+  border-color: transparent;
+  color: var(--accent-ink);
+}
+.gear-on:hover { color: var(--accent-ink); }
+
+.sheet {
+  position: fixed;
+  top: 72px;
+  right: 18px;
+  z-index: 40;
+  width: min(360px, calc(100vw - 36px));
+  /* Whatever is left of the window under the button, so a long list scrolls inside the card
+     rather than running off the bottom of the page. */
+  max-height: calc(100vh - 92px);
+  overflow-y: auto;
+  padding: 18px 20px 20px;
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, var(--glass-1), var(--glass-2) 55%, var(--glass-3));
+  backdrop-filter: blur(22px) saturate(170%) brightness(1.04);
+  -webkit-backdrop-filter: blur(22px) saturate(170%) brightness(1.04);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .62),
+    inset 0 0 0 1px rgba(255, 255, 255, .13),
+    var(--shadow-lift);
+  animation: sheet-in .22s var(--ease-out) both;
+}
+.sheet:focus { outline: none; }         /* it is focused only to carry the keyboard in */
+
+.sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+.sheet-head h2 {
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+.sheet-shut {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 8px;
+  color: var(--ink-soft);
+  font-size: 0;
+}
+.sheet-shut:hover { color: var(--ink); }
+
+.sheet-title {
+  font-family: var(--mono);
+  font-size: .68rem;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 18px 0 8px;
+}
+
+/* Keys on the left, what they do on the right. The columns are set from the content so a
+   row of three chips does not squeeze the sentence beside it into a column of one word. */
+.sheet-list {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 7px 12px;
+  align-items: baseline;
+}
+.sheet-list dt { white-space: nowrap; }
+.sheet-list dd {
+  color: var(--ink-soft);
+  font-size: .82rem;
+  line-height: 1.5;
+}
+
+.sheet kbd {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 6px;
+  border: 1px solid var(--rim-soft);
+  background: rgba(255, 255, 255, .1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .26);
+  font-family: var(--sans);
+  font-size: .74rem;
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+}
+/* The "+" between two chips, held away from both. */
+.sheet-list dt kbd + kbd { margin-left: 4px; }
+.sheet-list dt kbd:not(:first-child) { margin-left: 4px; }
+
+@keyframes sheet-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* A key chip is a lit face over a dark page and a shaded one over a light page. */
+:root[data-theme="light"] .sheet kbd {
+  background: rgba(19, 32, 46, .07);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .8);
+}
+
+/* ---------- what the drawn cursor says ----------
+   With the system cursor hidden everywhere, grab and pointer no longer say what can be done
+   at a spot. The ring says it, in the colours the display already uses for the same things,
+   so the ring and the block under it light up together and agree. shortcuts.js reads which
+   one applies off the classes script.js has written; here is only what each looks like.
+
+   Colour and glow only. The transform belongs to cursor.js, which writes position and scale
+   into it every frame — anything set here would be overwritten or would fight it. The ring
+   already carries a transition for background and border-color from motion.css; the dot has
+   none of its own, so it is given one. */
+
+/* Something to take hold of and drag. */
+.cur-ring.cur-grab {
+  border-color: rgba(255, 255, 255, .8);
+  background: rgba(255, 255, 255, .12);
+}
+.cur-dot.cur-grab {
+  background: #ffffff;
+  box-shadow: 0 0 12px rgba(255, 255, 255, .85);
+}
+
+/* Ctrl: the blue of a slot the keypad is about to be pointed at. */
+.cur-ring.cur-aim {
+  border-color: #8fd3e3;
+  background: rgba(143, 211, 227, .2);
+}
+.cur-dot.cur-aim {
+  background: #8fd3e3;
+  box-shadow: 0 0 12px rgba(143, 211, 227, .95);
+}
+
+/* Shift: the green of the ribbon lit across everything the drag would carry. */
+.cur-ring.cur-carry {
+  border-color: #9fe38f;
+  background: rgba(159, 227, 143, .2);
+}
+.cur-dot.cur-carry {
+  background: #9fe38f;
+  box-shadow: 0 0 12px rgba(159, 227, 143, .95);
+}
+
+/* An "=" with an answer waiting behind it, in the teal it lights itself. */
+.cur-ring.cur-press {
+  border-color: #8fe3d3;
+  background: rgba(143, 227, 211, .22);
+}
+.cur-dot.cur-press {
+  background: #8fe3d3;
+  box-shadow: 0 0 12px rgba(143, 227, 211, .95);
+}
+
+.cur-dot {
+  transition: background .2s var(--ease-out), box-shadow .2s var(--ease-out);
+}
+
+/* ---------- the drawn cursor over a light page ----------
+   Every colour above is a light one, picked to carry over a dark ground. Over a pale one
+   they are all but gone — white on white says nothing at all — so each is answered by the
+   darker member of the same family. The meanings do not move: blue is still aiming, green
+   is still carrying, teal is still an "=" with something behind it. Only the value turns,
+   the same way the ink of the page does. */
+:root[data-theme="light"] .cur-ring {
+  border-color: rgba(19, 32, 46, .42);
+  background: rgba(19, 32, 46, .05);
+}
+:root[data-theme="light"] .cur-dot {
+  background: var(--accent);
+  box-shadow: 0 0 10px rgba(18, 160, 116, .55);
+}
+
+:root[data-theme="light"] .cur-ring.cur-grab {
+  border-color: rgba(19, 32, 46, .6);
+  background: rgba(19, 32, 46, .08);
+}
+:root[data-theme="light"] .cur-dot.cur-grab {
+  background: #16202c;
+  box-shadow: 0 0 10px rgba(19, 32, 46, .45);
+}
+
+:root[data-theme="light"] .cur-ring.cur-aim {
+  border-color: #1c7f9c;
+  background: rgba(28, 127, 156, .16);
+}
+:root[data-theme="light"] .cur-dot.cur-aim {
+  background: #1c7f9c;
+  box-shadow: 0 0 10px rgba(28, 127, 156, .6);
+}
+
+:root[data-theme="light"] .cur-ring.cur-carry {
+  border-color: #2f8f3f;
+  background: rgba(47, 143, 63, .16);
+}
+:root[data-theme="light"] .cur-dot.cur-carry {
+  background: #2f8f3f;
+  box-shadow: 0 0 10px rgba(47, 143, 63, .6);
+}
+
+:root[data-theme="light"] .cur-ring.cur-press {
+  border-color: #0e7c86;
+  background: rgba(14, 124, 134, .16);
+}
+:root[data-theme="light"] .cur-dot.cur-press {
+  background: #0e7c86;
+  box-shadow: 0 0 10px rgba(14, 124, 134, .6);
+}
+
+/* Through a native drag the browser draws a cursor of its own and stops sending the moves
+   this pair is followed by, so it stands out of the way rather than hanging frozen. */
+html.cursor-away .cur-dot,
+html.cursor-away .cur-ring {
+  opacity: 0;
+  transition: opacity .12s var(--ease-out);
+}
+
+/* Opacity only, for the reason given at .app: nothing may move the box the blocks are
+   measured inside. A blur is safe — it changes no coordinate. */
+@keyframes app-in {
+  from { opacity: 0; filter: blur(6px); }
+  to   { opacity: 1; filter: none; }
+}
+
+/* The graph is pinned to the bottom-right corner, and the machine is centred, so the two
+   run into each other as soon as the window is narrow enough: the panel is 258 wide sitting
+   24 from the right, the machine is 420 wide about the middle, and they touch at 984. Below
+   that the panel would cover the letters and the keys under it could not be pressed at all.
+   So it stops floating and takes its place under the machine instead, where the column body
+   is already centring everything.
+   relative rather than static: z-index only counts on a positioned box, and without it the
+   panel would fall behind the particle canvas. Both offsets go back to auto, or relative
+   would carry them over from the pinned rule above. */
+@media (max-width: 1000px) {
+  .graph {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    margin-bottom: 4px;
+  }
+}
+
+@media (max-width: 560px) {
+  body { padding: 16px 14px 28px; gap: 18px; }
+  .app { padding: 14px; }
+  .page-head h1 { margin: 10px 0 6px; }
+}
+
+/* CSS can turn off what CSS started; the particle canvas and the pointer damping are shut
+   down separately by IM.motionOK in assets/js/core.js, since a stylesheet cannot stop a
+   requestAnimationFrame loop. */
+@media (prefers-reduced-motion: reduce) {
+  .app { animation: none; }
+  .sheet { animation: none; }
+  .graph { animation: none; }
+  button { transition: none; }
+  button:active { transform: none; }
+  /* The curve draws itself through an inline transition set by script.js, and the frame is
+     eased by a ticker there too — both ask graphMayMove() first, which reads this same
+     preference, so a stylesheet has nothing left to switch off here. */
+  /* motion.css already takes the drawn cursor out of the page entirely here, so there is
+     nothing left for the hand-off to fade. */
+}
