@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Math</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:36px;
+    padding:48px 20px;
+    background:linear-gradient(148deg,#4a5568 0%,#2c3440 46%,#171b22 100%);
+    color:#f5f8fc;
+    font-family:'Leelawadee UI','Noto Sans Thai','Segoe UI',sans-serif;
+    text-align:center;
+  }
+  h1{font-size:clamp(1.8rem,5vw,2.6rem);font-weight:800;letter-spacing:-.02em;}
+  h1 span{color:#88f4c5;}
+  p{color:#cfd9e4;font-size:1rem;max-width:40ch;line-height:1.6;}
+  .grid{
+    display:grid;grid-template-columns:1fr;gap:14px;
+    width:100%;max-width:420px;
+  }
+  a.card{
+    display:flex;flex-direction:column;gap:4px;align-items:flex-start;
+    padding:18px 20px;border-radius:16px;text-decoration:none;color:inherit;
+    background:linear-gradient(180deg,rgba(255,255,255,.13),rgba(255,255,255,.045));
+    border:1px solid rgba(255,255,255,.2);
+    -webkit-tap-highlight-color:transparent;
+  }
+  a.card:active{background:rgba(255,255,255,.18);}
+  a.card b{font-size:1.05rem;}
+  a.card span{font-size:.85rem;color:#94a2b3;}
+  footer{color:#6b7785;font-size:.8rem;}
+</style>
+</head>
+<body>
+  <div>
+    <h1>Interactive<br><span>Math</span></h1>
+    <p style="margin-top:12px;">โครงงานคณิตศาสตร์แบบลงมือทำ — เลือกส่วนที่อยากเปิด</p>
+  </div>
+
+  <div class="grid">
+    <a class="card" href="หน้าเว็บ/index.html">
+      <b>🌐 เว็บไซต์หลัก</b>
+      <span>Math Lab · คลังบทเรียนวิดีโอ</span>
+    </a>
+    <a class="card" href="เครื่องคิดเลข/เครื่องคิดเลข-บล็อก_2.html">
+      <b>🧮 เครื่องคิดเลขบล็อก</b>
+      <span>ลากพจน์แก้สมการ · วาดกราฟอัตโนมัติ</span>
+    </a>
+    <a class="card" href="เรขาคณิต/index.html">
+      <b>📐 กระดานเรขาคณิต</b>
+      <span>วาดรูป วัดมุม ความยาว พื้นที่</span>
+    </a>
+    <a class="card" href="สไลด์นำเสนอ-Interactive-Math.html">
+      <b>📊 สไลด์นำเสนอโครงงาน</b>
+      <span>17 หน้า สรุปทั้งโปรเจกต์</span>
+    </a>
+  </div>
+
+  <footer>โรงเรียนเลยพิทยาคม</footer>
+</body>
+</html>
